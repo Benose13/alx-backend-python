@@ -12,8 +12,8 @@ def connect_db():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="Benose13",          # update with your MySQL username
-            password="Iamhead-11"   # update with your MySQL password
+            user="Benose13",          
+            password="Iamhead-11"   
         )
         if connection.is_connected():
             return connection
@@ -37,8 +37,8 @@ def connect_to_prodev():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="Benose13",          # update with your MySQL username
-            password="Iamhead-11",  # update with your MySQL password
+            user="Benose13",          
+            password="Iamhead-11",  
             database=DB_NAME
         )
         if connection.is_connected():

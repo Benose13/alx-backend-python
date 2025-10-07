@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@npn@i))^j^o8lv3z!lfy*d!fle4m%q$uemcnlh8mks=b+6e%i'
+SECRET_KEY = 'django-insecure-$1om3jb4$%uzpem53h4g577v#s5__a@sha!xcis^f&rlj4(#23'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,17 +51,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Django REST Framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  #Enforce authentication
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',  #Browser session auth
-        'rest_framework.authentication.BasicAuthentication',    #fallback
-    ],
-}
-
 ROOT_URLCONF = 'messaging_app.urls'
 
 TEMPLATES = [
@@ -81,6 +70,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'messaging_app.wsgi.application'
 
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

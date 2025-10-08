@@ -3,13 +3,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-# ==============================
-# Custom User Model
-# ==============================
 class User(AbstractUser):
     """
-    Extends Django's built-in AbstractUser to include
-    additional fields required for the messaging app.
+    Custom User model extending AbstractUser with additional fields
+    required for the messaging app.
     """
     user_id = models.UUIDField(
         primary_key=True,
@@ -25,22 +22,17 @@ class User(AbstractUser):
         choices=[('guest', 'Guest'), ('host', 'Host'), ('admin', 'Admin')],
         default='guest'
     )
+    password = models.CharField(max_length=128, null=False)  # ✅ explicit password field
     created_at = models.DateTimeField(auto_now_add=True)
 
-    USERNAME_FIELD = 'email'  # use email instead of username for login
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
 
-# ==============================
-# Conversation Model
-# ==============================
 class Conversation(models.Model):
-    """
-    Represents a conversation that involves multiple users.
-    """
     conversation_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -56,13 +48,7 @@ class Conversation(models.Model):
         return f"Conversation between {participant_names}"
 
 
-# ==============================
-# Message Model
-# ==============================
 class Message(models.Model):
-    """
-    Represents a single message sent by a user in a conversation.
-    """
     message_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

@@ -22,7 +22,7 @@ class User(AbstractUser):
         choices=[('guest', 'Guest'), ('host', 'Host'), ('admin', 'Admin')],
         default='guest'
     )
-    password = models.CharField(max_length=128, null=False)  # ✅ explicit password field
+    password = models.CharField(max_length=128, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'email'

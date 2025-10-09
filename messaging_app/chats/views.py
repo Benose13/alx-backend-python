@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, filters   # ✅ added filters
+from rest_framework import viewsets, status, filters  
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
@@ -11,7 +11,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]   # ✅ enable search filtering
+    filter_backends = [filters.SearchFilter]  
     search_fields = ['participants__first_name', 'participants__last_name']
 
     def get_queryset(self):
@@ -43,8 +43,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-sent_at')
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]  # ✅ added filters
-    search_fields = ['message_body']
+    filter_backends = [filters.SearchFilter]  
 
     def get_queryset(self):
         """Return messages for a conversation if provided."""

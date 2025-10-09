@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include  # ✅ make sure 'include' is imported!
+from django.urls import path, include  
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('chats.urls')),  # ✅ this line loads your chats app routes
+    path('api/', include('chats.urls')), 
+    path('api-auth/', include('rest_framework.urls')), 
 ]

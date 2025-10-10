@@ -21,20 +21,24 @@ class IsParticipantOfConversation(permissions.BasePermission):
         return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        """
-        Check if the user is a participant of the conversation or related message.
-        - For Conversation objects: check participants field.
-        - For Message objects: check sender/recipient or conversation participants.
-        """
         user = request.user
 
-        # If object is a Conversation
+        # Check if the object is a Conversation
         if hasattr(obj, 'participants'):
+            # Only participants can view or modify the conversation
             return user in obj.participants.all()
 
-        # If object is a Message, ensure user is sender, recipient, or part of conversation
+        # Check if the object is a Message
         if hasattr(obj, 'conversation'):
             conversation = obj.conversation
-            return user in conversation.participants.all() or user == obj.sender
+            # Participants of the conversation can view the message
+            if request.method in permissions.SAFE_METHODS:
+                return user in conversation.participants.all()
+            
+            # For update/delete requests (PUT, PATCH, DELETE),
+            # Only the sender or conversation participants can modify/delete
+            if request.method in ['PUT', 'PATCH', 'DELETE']:
+                return user == obj.sender or user in conversation.participants.all()
 
+        # Default deny
         return False

@@ -1,17 +1,20 @@
 from rest_framework import viewsets, status, filters, permissions 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 from django.shortcuts import get_object_or_404
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipantOfConversation
-
+from .pagination import MessagePagination
+from .filters import MessageFilter
 
 class ConversationViewSet(viewsets.ModelViewSet):
     """ViewSet for listing and creating conversations."""
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
-    permission_classes = [IsParticipantOfConversation]
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.SearchFilter]  
     search_fields = ['participants__first_name', 'participants__last_name']
 
@@ -41,16 +44,24 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     """ViewSet for listing and sending messages."""
-    queryset = Message.objects.all().order_by('-sent_at')
+    queryset = Message.objects.all().order_by('-timestamp')
     serializer_class = MessageSerializer
-    permission_classes = [IsParticipantOfConversation]
-    filter_backends = [filters.SearchFilter]  
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    filter_backends = [filters.SearchFilter]
+    pagination_class = MessagePagination
+
+    # Filtering and ordering
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_class = MessageFilter
+    ordering_fields = ['timestamp']
+    search_fields = ['content', 'sender__username', 'recipient__username']
+  
 
     def get_queryset(self):
         """Return messages for a conversation if provided."""
         conversation_id = self.request.query_params.get('conversation')
         if conversation_id:
-            return Message.objects.filter(conversation_id=conversation_id).order_by('-sent_at')
+            return Message.objects.filter(conversation_id=conversation_id).order_by('-timestamp')
         return super().get_queryset()
 
     def create(self, request, *args, **kwargs):

@@ -44,7 +44,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     """ViewSet for listing and sending messages."""
-    queryset = Message.objects.all().order_by('-timestamp')
+    queryset = Message.objects.all().order_by('-sent_at')
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.SearchFilter]

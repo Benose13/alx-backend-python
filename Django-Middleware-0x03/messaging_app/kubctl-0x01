@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Script: kubctl-0x01
+# Purpose: Scale Django App Deployment in Kubernetes
+# Author: Benjamin Okoeguale
+# Project: alx-backend-python/messaging_app
+
+set -e
+
+echo "🚀 Starting Kubernetes scaling process for Django app..."
+
+# Step 1: Check cluster status
+echo "🔍 Checking Kubernetes cluster status..."
+kubectl cluster-info
+
+# Step 2: Check current deployments
+echo "📦 Checking current deployments..."
+kubectl get deployments
+
+# Step 3: Scale the Django deployment to 3 replicas
+DEPLOYMENT_NAME="django-deployment"
+
+echo "⚙️ Scaling $DEPLOYMENT_NAME to 3 replicas..."
+kubectl scale deployment $DEPLOYMENT_NAME --replicas=3
+
+# Step 4: Wait and verify new pods
+echo "🕒 Waiting for pods to scale up..."
+sleep 10
+
+echo "✅ Verifying running pods..."
+kubectl get pods -o wide
+
+# Step 5: (Optional) Verify Deployment status
+echo "📊 Checking deployment rollout status..."
+kubectl rollout status deployment/$DEPLOYMENT_NAME
+
+# Step 6: Load testing with wrk
+echo "💥 Starting load test using wrk..."
+
+# Ensure wrk is installed
+if ! command -v wrk &> /dev/null
+then
+    echo "⚠️ wrk not found! Installing wrk..."
+    sudo apt update && sudo apt install wrk -y
+fi
+
+# Get Django app URL (assuming exposed as a Service)
+APP_IP=$(minikube service django-service --url | head -n 1)
+
+echo "🌐 App URL: $APP_IP"
+echo "⏱ Running 30-second load test..."
+wrk -t2 -c50 -d30s $APP_IP
+
+# Step 7: Monitor resource usage
+echo "📈 Monitoring resource usage (Ctrl+C to stop)..."
+kubectl top pods
+
+echo "🎉 Scaling and monitoring complete!"

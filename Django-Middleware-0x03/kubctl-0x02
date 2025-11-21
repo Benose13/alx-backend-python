@@ -1,0 +1,25 @@
+#!/bin/bash
+# Script: kubctl-0x02
+# Purpose: Deploy Blue-Green strategy for Django App
+
+echo "Applying Blue Deployment..."
+kubectl apply -f blue_deployment.yaml
+
+echo "Applying Green Deployment..."
+kubectl apply -f green_deployment.yaml
+
+echo "Applying Service..."
+kubectl apply -f kubeservice.yaml
+
+echo "Checking Deployments..."
+kubectl get deployments
+
+echo "Checking Pods..."
+kubectl get pods -l app=django
+
+echo "Fetching logs from Green Deployment pods..."
+GREEN_POD=$(kubectl get pods -l app=django,version=green -o jsonpath='{.items[0].metadata.name}')
+kubectl logs $GREEN_POD
+
+echo "If logs look fine, switch traffic from blue to green in kubeservice.yaml"
+echo "Then reapply service: kubectl apply -f kubeservice.yaml"

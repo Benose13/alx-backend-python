@@ -100,7 +100,7 @@ class OffensiveLanguageMiddleware:
         return ip
 
 
-class RolePermissionMiddleware:
+class RolepermissionMiddleware:
     """
     Middleware to restrict access based on user roles.
     Only users with 'admin' or 'moderator' roles are allowed to access restricted endpoints.

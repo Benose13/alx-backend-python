@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.9-slim'  // Official Python Docker image
+            reuseNode true  // Reuse the workspace from the main node
+        }
+    }
     
     stages {
         stage('Checkout') {
@@ -10,22 +15,23 @@ pipeline {
                     extensions: [],
                     userRemoteConfigs: [[
                         url: 'https://github.com/Benose13/alx-backend-python.git',
-                        credentialsId: '8a64003b-5bc1-4f5d-948f-b1afde73743d'
+                        credentialsId: '8a64003b-5bc1-4f5d-948f-b1afde73743d'  // Use your existing credential ID
                     ]]
                 ])
             }
         }
         
-        stage('Set up Python environment') {
+        stage('Install dependencies') {
             steps {
-                sh 'python3 -m venv venv'
-                sh '. venv/bin/activate && pip install -r requirements.txt'
+                sh 'python --version'
+                sh 'pip --version'
+                sh 'pip install -r requirements.txt'
             }
         }
         
-        stage('Run Tests with pytest') {
+        stage('Run Tests') {
             steps {
-                sh '. venv/bin/activate && pytest --junitxml=test-results.xml --cov=./ --cov-report=xml'
+                sh 'pytest --junitxml=test-results.xml --cov=./ --cov-report=xml'
             }
             post {
                 always {

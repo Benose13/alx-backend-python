@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: '8a64003b-5bc1-4f5d-948f-b1afde73743d',
+                    credentialsId: 'github_ssh_key',
                     url: 'git@github.com:Benose13/alx-backend-python.git'
             }
         }

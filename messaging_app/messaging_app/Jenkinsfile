@@ -1,62 +1,50 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.9-slim'  // Official Python Docker image
-            reuseNode true  // Reuse the workspace from the main node
-        }
-    }
-    
+    agent any
+
     stages {
         stage('Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/master']],
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Benose13/alx-backend-python.git',
-                        credentialsId: '8a64003b-5bc1-4f5d-948f-b1afde73743d'  // Use your existing credential ID
-                    ]]
-                ])
+                echo 'Cloning repository from GitHub...'
+                git branch: 'main', 
+                    credentialsId: 'github-tokens', 
+                    url: 'git@github.com:Benose13/alx-backend-python.git'
             }
         }
-        
+
         stage('Install dependencies') {
             steps {
-                sh 'python --version'
-                sh 'pip --version'
-                sh 'pip install -r requirements.txt'
+                echo 'Installing dependencies...'
+                sh '''
+                    python3 -m venv venv
+                    source venv/bin/activate
+                    pip3 install --upgrade pip
+                    pip3 install -r messaging_app/requirements.txt
+                '''
             }
         }
-        
+
         stage('Run Tests') {
             steps {
-                sh 'pytest --junitxml=test-results.xml --cov=./ --cov-report=xml'
+                echo 'Running pytest...'
+                sh '''
+                    source venv/bin/activate
+                    pytest messaging_app/tests --maxfail=1 --disable-warnings -q --junitxml=report.xml
+                '''
             }
-            post {
-                always {
-                    junit 'test-results.xml'
-                    publishHTML([
-                        target: [
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'htmlcov',
-                            reportFiles: 'index.html',
-                            reportName: 'Coverage Report'
-                        ]
-                    ])
-                }
+        }
+
+        stage('Publish Test Report') {
+            steps {
+                echo 'Publishing test results...'
+                junit 'report.xml'
             }
         }
     }
-    
+
     post {
         always {
-            echo 'Pipeline completed - check test results and coverage report'
-        }
-        failure {
-            echo '❌ Pipeline failed — check logs and test report.'
+            echo 'Cleaning workspace...'
+            cleanWs()
         }
     }
 }
